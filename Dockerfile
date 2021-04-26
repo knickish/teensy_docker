@@ -65,6 +65,9 @@ RUN mkdir -p /teensyduino/arduino-1.8.13/hardware/tools && \
 ADD Makefile .
 RUN rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
     chmod -R +x /teensyduino/arduino-1.8.13/hardware/tools/*  && \
-    mkdir /src/ 
+    ls -alh /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3 && \
+    mkdir /src 
 
-CMD cp -r /src . && ls -alh . && make
+CMD cp -ru /src/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3/ && \
+    ls -alh /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3 && \
+    make

@@ -1,4 +1,4 @@
 #!/bin/bash
 mkdir -p ./src
-mkdir -p ./adruino_src
+mkdir -p ./arduino_src
 docker build -t teensy_dev .
