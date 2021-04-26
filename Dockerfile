@@ -34,8 +34,6 @@ RUN mkdir -p /etc/udev/rules.d/  && \
             KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04*", MODE:="0666", RUN:="/bin/stty -F /dev/%k raw -echo" \
             KERNEL=="hidraw*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04*", MODE:="0666" \
             SUBSYSTEMS=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04*", MODE:="0666" >> /etc/udev/rules.d/00-teensy.rules
-
-
 # ------------------------------------------------------------------------------
 # Download large files
 WORKDIR /teensyduino
@@ -65,14 +63,13 @@ RUN tar -xf arduino-1.8.13-linux64.tar.xz && \
 
 WORKDIR /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3
 RUN mkdir -p /teensyduino/arduino-1.8.13/hardware/tools && \
-    teensy_loader_cli --mcu=TEENSY36 && \
-    # rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
+    rm Makefile
+ADD Makefile .
+RUN # teensy_loader_cli --mcu=TEENSY36 && \
+    rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
     # cp -r /teensy_cli/teensy_loader_cli /teensyduino/arduino-1.8.13/hardware/tools && \
     chmod -R +x /teensyduino/arduino-1.8.13/hardware/tools/*  && \
-    ls -al /teensyduino/arduino-1.8.13/hardware/tools && \
-    cat Makefile 
+    # tree /teensyduino/arduino-1.8.13/hardware/tools && \
+    ls -alh /teensyduino/arduino-1.8.13/hardware/tools 
 
-RUN make
-
-
-WORKDIR /arduino
+CMD make
