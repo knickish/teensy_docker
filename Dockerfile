@@ -69,5 +69,4 @@ RUN rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardwa
     mkdir /src 
 
 CMD cp -ru /src/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3/ && \
-    ls -alh /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3 && \
-    make
+    make -s
