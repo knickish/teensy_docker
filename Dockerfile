@@ -48,9 +48,7 @@ RUN git clone -q https://github.com/PaulStoffregen/teensy_loader_cli && \
     cd teensy_loader_cli && \
     make && \
     cd rebootor && \
-    make && \
-    cd .. && \
-    tree
+    make 
 ENV PATH="$PATH:/teensy_cli/teensy_loader_cli/"
 
 
@@ -63,13 +61,12 @@ RUN tar -xf arduino-1.8.13-linux64.tar.xz && \
 
 WORKDIR /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3
 RUN mkdir -p /teensyduino/arduino-1.8.13/hardware/tools && \
-    rm Makefile
+    rm Makefile 
 ADD Makefile .
-RUN # teensy_loader_cli --mcu=TEENSY36 && \
-    rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
+RUN rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
     # cp -r /teensy_cli/teensy_loader_cli /teensyduino/arduino-1.8.13/hardware/tools && \
     chmod -R +x /teensyduino/arduino-1.8.13/hardware/tools/*  && \
-    # tree /teensyduino/arduino-1.8.13/hardware/tools && \
-    ls -alh /teensyduino/arduino-1.8.13/hardware/tools 
+    mkdir /src && \
+    ls -alh 
 
-CMD make
+CMD cp -r /src/* . && make

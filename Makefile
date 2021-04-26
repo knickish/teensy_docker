@@ -138,7 +138,6 @@ $(TARGET).elf: $(OBJS) $(MCU_LD)
 ifneq (,$(wildcard $(TOOLSPATH)))
 	# $(TOOLSPATH)/teensy_post_compile -file=$(basename $@) -path=$(shell pwd) -tools=$(TOOLSPATH)
 	teensy_loader_cli --mcu=TEENSY36 -w -v $(basename $@).hex
-	-$(TOOLSPATH)/teensy_reboot
 endif
 
 # compiler generated dependency info
