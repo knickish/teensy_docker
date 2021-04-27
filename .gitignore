@@ -1,2 +1,5 @@
 src/*
 arduino_src/*
+other_mains/*
+libs/*
+.vscode/*

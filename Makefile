@@ -39,7 +39,7 @@ MCU_LD = $(LOWER_MCU).ld
 
 # The name of your project (used to name the compiled .hex file)
 TARGET = main
-
+TEENSY = 36
 # Those that specify a NO_ARDUINO environment variable will
 # be able to use this Makefile with no Arduino dependency.
 # Please note that if ARDUINOPATH was set, it will override
@@ -111,6 +111,38 @@ LDFLAGS = -Os -Wl,--gc-sections,--defsym=__rtc_localtime=0 --specs=nano.specs -m
 # additional libraries to link
 LIBS = -lm
 
+# compiler options specific to teensy version
+ifeq ($(TEENSY), 30)
+    CPPFLAGS += -D__MK20DX128__ -mcpu=cortex-m4
+    LDSCRIPT = $(COREPATH)/mk20dx128.ld
+    LDFLAGS += -mcpu=cortex-m4 -T$(LDSCRIPT)
+else ifeq ($(TEENSY), 31)
+    CPPFLAGS += -D__MK20DX256__ -mcpu=cortex-m4
+    LDSCRIPT = $(COREPATH)/mk20dx256.ld
+    LDFLAGS += -mcpu=cortex-m4 -T$(LDSCRIPT)
+else ifeq ($(TEENSY), 32)
+    CPPFLAGS += -D__MK20DX256__ -mcpu=cortex-m4
+    LDSCRIPT = $(COREPATH)/mk20dx256.ld
+    LDFLAGS += -mcpu=cortex-m4 -T$(LDSCRIPT)
+else ifeq ($(TEENSY), LC)
+    CPPFLAGS += -D__MKL26Z64__ -mcpu=cortex-m0plus
+    LDSCRIPT = $(COREPATH)/mkl26z64.ld
+    LDFLAGS += -mcpu=cortex-m0plus -T$(LDSCRIPT)
+    LIBS += -larm_cortexM0l_math
+else ifeq ($(TEENSY), 35)
+    CPPFLAGS += -D__MK64FX512__ -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
+    LDSCRIPT = $(COREPATH)/mk64fx512.ld
+    LDFLAGS += -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T$(LDSCRIPT)
+    LIBS += -larm_cortexM4lf_math
+else ifeq ($(TEENSY), 36)
+    CPPFLAGS += -D__MK66FX1M0__ -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
+    LDSCRIPT = $(COREPATH)/mk66fx1m0.ld
+    LDFLAGS += -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T$(LDSCRIPT)
+    LIBS += -larm_cortexM4lf_math
+else
+    $(error Invalid setting for TEENSY)
+endif
+
 
 # names for the compiler programs
 CC = $(COMPILERPATH)/arm-none-eabi-gcc
@@ -120,14 +152,26 @@ SIZE = $(COMPILERPATH)/arm-none-eabi-size
 
 # automatically create lists of the sources and objects
 # TODO: this does not handle Arduino libraries yet...
+LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
+LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
 C_FILES := $(wildcard *.c)
 CPP_FILES := $(wildcard *.cpp)
-OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o)
+OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o) $(LC_FILES:.c=.o) $(LCPP_FILES:.cpp=.o)
 
 
 # the actual makefile rules (all .o files built by GNU make's default implicit rules)
 
 all: $(TARGET).hex
+
+%.o: %.c
+	@echo -e "[CC]\t$<"
+	@mkdir -p "$(dir $@)"
+	@$(CC) $(CPPFLAGS) $(CFLAGS) $(L_INC) -o "$@" -c "$<"
+
+%.o: %.cpp
+	@echo -e "[CXX]\t$<"
+	@mkdir -p "$(dir $@)"
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(L_INC) -o "$@" -c "$<"
 
 $(TARGET).elf: $(OBJS) $(MCU_LD)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
