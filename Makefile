@@ -152,13 +152,13 @@ SIZE = $(COMPILERPATH)/arm-none-eabi-size
 
 # automatically create lists of the sources and objects
 # TODO: this does not handle Arduino libraries yet...
-LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
-LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
-LC_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.c)
-LCPP_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.cpp)
+# LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
+# LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
+# LC_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.c)
+# LCPP_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.cpp)
 C_FILES := $(wildcard *.c)
 CPP_FILES := $(wildcard *.cpp)
-OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o) $(LC_FILES:.c=.o) $(LCPP_FILES:.cpp=.o)
+OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o) # $(LC_FILES:.c=.o) $(LCPP_FILES:.cpp=.o)
 
 L_INC := $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/.)))
 L_INC += $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/src/.)))
@@ -170,14 +170,14 @@ L_INC += $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/utility/.)))
 all: $(TARGET).hex
 
 %.o: %.c
-	echo -e "[CC]\t$<"
-	mkdir -p "$(dir $@)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(L_INC) -o "$@" -c "$<"
+	@echo -e "[CC]\t$<"
+	@mkdir -p "$(dir $@)"
+	@$(CC) $(CPPFLAGS) $(CFLAGS) $(L_INC) -o "$@" -c "$<"
 
 %.o: %.cpp
-	echo -e "[CXX]\t$<"
-	mkdir -p "$(dir $@)"
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(L_INC) -o "$@" -c "$<"
+	@echo -e "[CXX]\t$<"
+	@mkdir -p "$(dir $@)"
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(L_INC) -o "$@" -c "$<"
 
 $(TARGET).elf: $(OBJS) $(LDSCRIPT)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
