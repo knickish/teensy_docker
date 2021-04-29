@@ -28,14 +28,14 @@
 # SOFTWARE.
 
 # set your MCU type here, or make command line `make MCU=MK20DX256`
-MCU=MK20DX256
+#MCU=MK20DX256
 #MCU=MKL26Z64
 #MCU=MK64FX512
 #MCU=MK66FX1M0
 
 # make it lower case
-LOWER_MCU := $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$(MCU)))))))))))))))))))))))))))
-MCU_LD = $(LOWER_MCU).ld
+# LOWER_MCU := $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$(MCU)))))))))))))))))))))))))))
+# MCU_LD = $(LOWER_MCU).ld
 
 # The name of your project (used to name the compiled .hex file)
 TARGET = main
@@ -53,7 +53,7 @@ endif
 OPTIONS = -DF_CPU=48000000 -DUSB_SERIAL -DLAYOUT_US_ENGLISH -DUSING_MAKEFILE
 
 # options needed by many Arduino libraries to configure for Teensy 3.x
-OPTIONS += -D__$(MCU)__ -DARDUINO=10805 -DTEENSYDUINO=144
+OPTIONS += -DARDUINO=10805 -DTEENSYDUINO=144
 
 # use "cortex-m4" for Teensy 3.x
 # use "cortex-m0plus" for Teensy LC
@@ -80,7 +80,7 @@ ifdef ARDUINOPATH
 TOOLSPATH = $(abspath $(ARDUINOPATH)/hardware/tools)
 
 # path location for Arduino libraries (currently not used)
-LIBRARYPATH = $(abspath $(ARDUINOPATH)/libraries)
+LIBRARYPATH = $(abspath ../../libraries)
 
 # path location for the arm-none-eabi compiler
 COMPILERPATH = $(abspath $(ARDUINOPATH)/hardware/tools/arm/bin)
@@ -97,7 +97,7 @@ endif
 #************************************************************************
 
 # CPPFLAGS = compiler options for C and C++
-CPPFLAGS = -Wall -g -Os -mcpu=$(CPUARCH) -mthumb -MMD $(OPTIONS) -I.
+CPPFLAGS = -Wall -g -Os -mcpu=$(CPUARCH) -mthumb -MMD $(OPTIONS) -I. -DLowPower_h
 
 # compiler options for C++ only
 CXXFLAGS = -std=gnu++14 -felide-constructors -fno-exceptions -fno-rtti
@@ -106,7 +106,7 @@ CXXFLAGS = -std=gnu++14 -felide-constructors -fno-exceptions -fno-rtti
 CFLAGS =
 
 # linker options
-LDFLAGS = -Os -Wl,--gc-sections,--defsym=__rtc_localtime=0 --specs=nano.specs -mcpu=$(CPUARCH) -mthumb -T$(MCU_LD)
+LDFLAGS = -Os -Wl,--gc-sections,--defsym=__rtc_localtime=0 --specs=nano.specs -mcpu=$(CPUARCH) -mthumb 
 
 # additional libraries to link
 LIBS = -lm
@@ -114,29 +114,29 @@ LIBS = -lm
 # compiler options specific to teensy version
 ifeq ($(TEENSY), 30)
     CPPFLAGS += -D__MK20DX128__ -mcpu=cortex-m4
-    LDSCRIPT = $(COREPATH)/mk20dx128.ld
+    LDSCRIPT = mk20dx128.ld
     LDFLAGS += -mcpu=cortex-m4 -T$(LDSCRIPT)
 else ifeq ($(TEENSY), 31)
     CPPFLAGS += -D__MK20DX256__ -mcpu=cortex-m4
-    LDSCRIPT = $(COREPATH)/mk20dx256.ld
+    LDSCRIPT = mk20dx256.ld
     LDFLAGS += -mcpu=cortex-m4 -T$(LDSCRIPT)
 else ifeq ($(TEENSY), 32)
     CPPFLAGS += -D__MK20DX256__ -mcpu=cortex-m4
-    LDSCRIPT = $(COREPATH)/mk20dx256.ld
+    LDSCRIPT = mk20dx256.ld
     LDFLAGS += -mcpu=cortex-m4 -T$(LDSCRIPT)
 else ifeq ($(TEENSY), LC)
     CPPFLAGS += -D__MKL26Z64__ -mcpu=cortex-m0plus
-    LDSCRIPT = $(COREPATH)/mkl26z64.ld
+    LDSCRIPT = mkl26z64.ld
     LDFLAGS += -mcpu=cortex-m0plus -T$(LDSCRIPT)
     LIBS += -larm_cortexM0l_math
 else ifeq ($(TEENSY), 35)
     CPPFLAGS += -D__MK64FX512__ -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
-    LDSCRIPT = $(COREPATH)/mk64fx512.ld
+    LDSCRIPT = mk64fx512.ld
     LDFLAGS += -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T$(LDSCRIPT)
     LIBS += -larm_cortexM4lf_math
 else ifeq ($(TEENSY), 36)
     CPPFLAGS += -D__MK66FX1M0__ -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
-    LDSCRIPT = $(COREPATH)/mk66fx1m0.ld
+    LDSCRIPT = mk66fx1m0.ld
     LDFLAGS += -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T$(LDSCRIPT)
     LIBS += -larm_cortexM4lf_math
 else
@@ -154,34 +154,39 @@ SIZE = $(COMPILERPATH)/arm-none-eabi-size
 # TODO: this does not handle Arduino libraries yet...
 LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
 LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
+LC_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.c)
+LCPP_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.cpp)
 C_FILES := $(wildcard *.c)
 CPP_FILES := $(wildcard *.cpp)
 OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o) $(LC_FILES:.c=.o) $(LCPP_FILES:.cpp=.o)
 
+L_INC := $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/.)))
+L_INC += $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/src/.)))
+L_INC += $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/utility/.)))
+# L_INC += $(patsubst %,-I%,/teensyduino/arduino-1.8.13/hardware/tools/avr/avr/include)
 
 # the actual makefile rules (all .o files built by GNU make's default implicit rules)
 
 all: $(TARGET).hex
 
 %.o: %.c
-	@echo -e "[CC]\t$<"
-	@mkdir -p "$(dir $@)"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(L_INC) -o "$@" -c "$<"
+	echo -e "[CC]\t$<"
+	mkdir -p "$(dir $@)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(L_INC) -o "$@" -c "$<"
 
 %.o: %.cpp
-	@echo -e "[CXX]\t$<"
-	@mkdir -p "$(dir $@)"
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(L_INC) -o "$@" -c "$<"
+	echo -e "[CXX]\t$<"
+	mkdir -p "$(dir $@)"
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(L_INC) -o "$@" -c "$<"
 
-$(TARGET).elf: $(OBJS) $(MCU_LD)
+$(TARGET).elf: $(OBJS) $(LDSCRIPT)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
 %.hex: %.elf
 	$(SIZE) $<
 	$(OBJCOPY) -O ihex -R .eeprom $< $@
 ifneq (,$(wildcard $(TOOLSPATH)))
-	# $(TOOLSPATH)/teensy_post_compile -file=$(basename $@) -path=$(shell pwd) -tools=$(TOOLSPATH)
-	teensy_loader_cli --mcu=TEENSY36 -w -v $(basename $@).hex
+	teensy_loader_cli --mcu=TEENSY${TEENSY} -w -v $(basename $@).hex
 endif
 
 # compiler generated dependency info

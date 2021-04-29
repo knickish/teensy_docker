@@ -59,17 +59,21 @@ RUN tar -xf arduino-1.8.13-linux64.tar.xz && \
     chmod 755 TeensyduinoInstall.linux64 && \
     ./TeensyduinoInstall.linux64 --dir=/teensyduino/arduino-1.8.13
 
+WORKDIR /libs
+RUN git clone https://github.com/adafruit/Adafruit_BusIO.git && \
+    git clone https://github.com/adafruit/Adafruit-GFX-Library.git
+
 WORKDIR /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3
 RUN mkdir -p /teensyduino/arduino-1.8.13/hardware/tools && \
     rm Makefile 
 ADD Makefile .
 RUN rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
     chmod -R +x /teensyduino/arduino-1.8.13/hardware/tools/*  && \
-    ls -alh /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3 && \
     mkdir /src && \
-    mkdir /libs && \
-    echo yes
+    rm /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/LowPower/LowPower.cpp
 
-CMD cp -ru /src/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3/ && \
+CMD rm main.c* && \
+    cp -ru /src/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3 && \
     cp -ru /libs/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries && \
-    make 
+    ls -al && \
+    make
