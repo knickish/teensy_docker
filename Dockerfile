@@ -49,35 +49,31 @@ RUN git clone -q https://github.com/PaulStoffregen/teensy_loader_cli && \
     cd teensy_loader_cli && \
     make && \
     cd rebootor && \
-    make 
+    make
 ENV PATH="$PATH:/teensy_cli/teensy_loader_cli/"
 
+
+WORKDIR /helper_scripts  
+ADD internal_scripts/* .
+ENV PYTHONPATH="${PYTHONPATH}:/helper_scripts"
 
 # ------------------------------------------------------------------------------
 # Check git setting
 WORKDIR /teensyduino
 RUN tar -xf arduino-1.8.13-linux64.tar.xz && \
     chmod 755 TeensyduinoInstall.linux64 && \
-    ./TeensyduinoInstall.linux64 --dir=/teensyduino/arduino-1.8.13
+    ./TeensyduinoInstall.linux64 --dir=/teensyduino/arduino-1.8.13 && \
+    mkdir -p ./libraries && \
+    mkdir -p ./cores && \
+    mkdir -p ./src && \
+    cp -r /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/* ./libraries && \
+    cp -r /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/* ./cores 
 
-WORKDIR /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries
+WORKDIR /teensyduino/libraries
 RUN git clone https://github.com/adafruit/Adafruit_BusIO.git && \
-    git clone https://github.com/adafruit/Adafruit-GFX-Library.git 
-
-
-WORKDIR /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3
-RUN mkdir -p /teensyduino/arduino-1.8.13/hardware/tools && \
-    rm Makefile 
-
-ADD Makefile .
-
-RUN rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
-    chmod -R +x /teensyduino/arduino-1.8.13/hardware/tools/*  && \
+    git clone https://github.com/adafruit/Adafruit-GFX-Library.git && \
     mkdir /src
 
-RUN rm /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/LowPower/LowPower.cpp
+RUN python3 -m lib_json_generator /teensyduino/libraries
 
-CMD rm main.c* && \
-    cp -ru /src/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3 && \
-    cp -ru /libs/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries && \
-    make
+CMD ["/helper_scripts/entrypoint.sh",]
