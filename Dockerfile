@@ -16,7 +16,8 @@ RUN apt -y update && \
     g++ \
     gcc-avr \
     binutils-avr \
-    avr-libc
+    avr-libc \
+    cmake
 
 RUN apt -y install unzip \
     libusb-dev \
@@ -67,20 +68,16 @@ RUN git clone https://github.com/adafruit/Adafruit_BusIO.git && \
 WORKDIR /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3
 RUN mkdir -p /teensyduino/arduino-1.8.13/hardware/tools && \
     rm Makefile 
+
 ADD Makefile .
+
 RUN rsync -vt /teensy_cli/teensy_loader_cli/* /teensyduino/arduino-1.8.13/hardware/tools && \
     chmod -R +x /teensyduino/arduino-1.8.13/hardware/tools/*  && \
     mkdir /src
 
-#remove teensy 4.0 specific libraries
-#TODO move to makefile
-# RUN rm /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/LowPower/LowPower.cpp && \
-#     rm -rf /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/ks0108/ && \
-#     rm -rf /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/QuadEncoder/ && \
-#     rm -rf /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/NativeEthernet/
+RUN rm /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/LowPower/LowPower.cpp
 
 CMD rm main.c* && \
     cp -ru /src/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/teensy3 && \
     cp -ru /libs/* /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries && \
-    ls -al && \
     make

@@ -39,7 +39,7 @@
 
 # The name of your project (used to name the compiled .hex file)
 TARGET = main
-TEENSY = 36
+TEENSY = 32
 # Those that specify a NO_ARDUINO environment variable will
 # be able to use this Makefile with no Arduino dependency.
 # Please note that if ARDUINOPATH was set, it will override
@@ -152,18 +152,17 @@ SIZE = $(COMPILERPATH)/arm-none-eabi-size
 
 # automatically create lists of the sources and objects
 # TODO: this does not handle Arduino libraries yet...
-# LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
-# LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
-# LC_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.c)
-# LCPP_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.cpp)
+LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
+LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
+LC_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.c)
+LCPP_FILES += $(wildcard $(LIBRARYPATH)/*/src/*.cpp)
 C_FILES := $(wildcard *.c)
 CPP_FILES := $(wildcard *.cpp)
-OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o) # $(LC_FILES:.c=.o) $(LCPP_FILES:.cpp=.o)
+OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o) $(LC_FILES:.c=.o) $(LCPP_FILES:.cpp=.o)
 
 L_INC := $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/.)))
 L_INC += $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/src/.)))
 L_INC += $(patsubst %,-I%,$(dir $(wildcard $(LIBRARYPATH)/*/utility/.)))
-# L_INC += $(patsubst %,-I%,/teensyduino/arduino-1.8.13/hardware/tools/avr/avr/include)
 
 # the actual makefile rules (all .o files built by GNU make's default implicit rules)
 
@@ -171,16 +170,16 @@ all: $(TARGET).hex
 
 %.o: %.c
 	@echo -e "[CC]\t$<"
-	@mkdir -p "$(dir $@)"
+	mkdir -p "$(dir $@)"
 	@$(CC) $(CPPFLAGS) $(CFLAGS) $(L_INC) -o "$@" -c "$<"
 
 %.o: %.cpp
 	@echo -e "[CXX]\t$<"
-	@mkdir -p "$(dir $@)"
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(L_INC) -o "$@" -c "$<"
+	mkdir -p "$(dir $@)"
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(L_INC) -o "$@" -c "$<"
 
 $(TARGET).elf: $(OBJS) $(LDSCRIPT)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ -k $(OBJS) $(LIBS)
 
 %.hex: %.elf
 	$(SIZE) $<
