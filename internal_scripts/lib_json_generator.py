@@ -12,7 +12,7 @@ def main():
                 usage_dict[direct] = json.load(os.path.join(path, direct, "config.json"))
             else:
                 usage_dict[direct] = {}
-                usage_dict[direct]["supported"] = json_outer["teensy_types"]
+                usage_dict[direct]["supported"] = teensy_types
                 usage_dict[direct]["conflicts"] = []
 
     json_outer = usage_dict

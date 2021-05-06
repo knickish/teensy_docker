@@ -10,7 +10,8 @@ ARG WORKDIR=/root
 # Install tools via apt
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt -y update && \
-    apt -y install git \
+    apt -y \
+    install git \
     make \
     gcc \
     g++ \
@@ -19,14 +20,16 @@ RUN apt -y update && \
     avr-libc \
     cmake
 
-RUN apt -y install unzip \
+RUN apt -y \
+    install unzip \
     libusb-dev \
     wget \
     xz-utils \
     libfontconfig1 \
     libxft-dev \
     rsync \
-    tree \
+    tree \ 
+    python3.8 \
     && apt clean && rm -rf /var/lib/apt/lists
 
 RUN mkdir -p /etc/udev/rules.d/  && \  
@@ -52,15 +55,11 @@ RUN git clone -q https://github.com/PaulStoffregen/teensy_loader_cli && \
     make
 ENV PATH="$PATH:/teensy_cli/teensy_loader_cli/"
 
-
-WORKDIR /helper_scripts  
-ADD internal_scripts/* .
-ENV PYTHONPATH="${PYTHONPATH}:/helper_scripts"
-
 # ------------------------------------------------------------------------------
 # Check git setting
 WORKDIR /teensyduino
 RUN tar -xf arduino-1.8.13-linux64.tar.xz && \
+    rm arduino-1.8.13-linux64.tar.xz && \
     chmod 755 TeensyduinoInstall.linux64 && \
     ./TeensyduinoInstall.linux64 --dir=/teensyduino/arduino-1.8.13 && \
     mkdir -p ./libraries && \
@@ -74,6 +73,10 @@ RUN git clone https://github.com/adafruit/Adafruit_BusIO.git && \
     git clone https://github.com/adafruit/Adafruit-GFX-Library.git && \
     mkdir /src
 
-RUN python3 -m lib_json_generator /teensyduino/libraries
+WORKDIR /helper_scripts  
+ADD internal_scripts/* /helper_scripts/
+ENV PYTHONPATH="${PYTHONPATH}:/helper_scripts"
 
-CMD ["/helper_scripts/entrypoint.sh",]
+RUN /usr/bin/python3.8 -m lib_json_generator /teensyduino/libraries
+
+CMD ["/bin/bash","/helper_scripts/entrypoint.sh"]

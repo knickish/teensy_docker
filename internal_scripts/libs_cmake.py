@@ -1,5 +1,5 @@
 import os, sys
-import subprocess
+import json
 
 conf_path = "/teensyduino/config.json"
 libs_path = "/teensyduino/libraries"
@@ -23,7 +23,7 @@ def build(lib_dir):
         if os.path.isdir(os.path.join(lib_dir, direct)):
             if direct in config:
                 with open(os.path.join(lib_dir, direct, "CMakeLists.txt"), "w") as f:
-                    f.write(generate_lib_cmake(config[direct][supported], config[direct][conflicts]))
+                    f.write(generate_lib_cmake(config[direct]["supported"], config[direct]["conflicts"]))
     
     with open(os.path.join(lib_dir, "CMakeLists.txt"), "w") as f:
         f.write(generate_lib_top_cmake(config))
@@ -36,4 +36,5 @@ if __name__ == "__main__":
     if not len(sys.argv)>=2:
         sys.exit(1)
     lib_dir = sys.argv[1]
-    sys.exit(build_all(build_top_dir, lib_dir))
+    print(lib_dir)
+    build(lib_dir)
