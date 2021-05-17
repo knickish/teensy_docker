@@ -42,8 +42,7 @@ RUN mkdir -p /etc/udev/rules.d/  && \
 # Download large files
 WORKDIR /teensyduino
 RUN wget -q https://downloads.arduino.cc/arduino-1.8.13-linux64.tar.xz && \
-    wget -q https://www.pjrc.com/teensy/td_153/TeensyduinoInstall.linux64 
-    
+    wget -q https://www.pjrc.com/teensy/td_153/TeensyduinoInstall.linux64
 
 # ------------------------------------------------------------------------------
 # Configure teensyloader cli
@@ -73,10 +72,44 @@ RUN git clone https://github.com/adafruit/Adafruit_BusIO.git && \
     git clone https://github.com/adafruit/Adafruit-GFX-Library.git && \
     mkdir /src
 
+RUN apt update -y && \
+    apt install -y strace
+
+WORKDIR /teensyduino/bin
+RUN cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/bin/* . && \
+    cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* . && \
+    cp -u /teensyduino/cores/teensy3/*.ld . && \
+    mkdir -p /teensyduino/lib/gcc && \
+    cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* /teensyduino/lib/gcc
+    
+
+
+WORKDIR /teensyduino/include
+RUN cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/include/* . && \
+    cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/lib/armv7e-m/* . && \
+    cp /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/lib/nano.specs . && \
+    mv /teensyduino/include/crt0.o /teensyduino/lib/gcc
+    
+
+ENV PATH="/teensyduino/bin:/teensyduino/include:/teensyduino/bin/plugin/include:$PATH"
+
+WORKDIR /teensyduino
+RUN mkdir -p /teensyduino/install && \
+    mkdir -p /teensyduino/build
+ADD CMake/project_root/* /teensyduino/
+ADD CMake/toolchain/* /teensyduino/
+ADD config.json /teensyduino/
+# ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy3
+# ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy4
+# ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy
+ADD CMake/select_all/CMakeLists.txt /teensyduino/src
 WORKDIR /helper_scripts  
 ADD internal_scripts/* /helper_scripts/
 ENV PYTHONPATH="${PYTHONPATH}:/helper_scripts"
 
-RUN /usr/bin/python3.8 -m lib_json_generator /teensyduino/libraries
+
+ENV LD_LIBRARY_PATH="/teensyduino/bin"
+
+RUN cp /teensyduino/bin/arm-none-eabi-as /usr/bin/as
 
 CMD ["/bin/bash","/helper_scripts/entrypoint.sh"]

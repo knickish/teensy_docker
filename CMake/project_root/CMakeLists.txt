@@ -1,19 +1,98 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.13)
 project(TEENSY)
 include(macros.cmake)
-# define library version (update: apparently you can also do it in project()!)
-set(MY_LIBRARY_VERSION_MAJOR 1 CACHE STRING "major version" FORCE)
-set(MY_LIBRARY_VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
-set(MY_LIBRARY_VERSION ${MY_LIBRARY_VERSION_MAJOR}.${MY_LIBRARY_VERSION_MINOR} CACHE STRING "version" FORCE)
+enable_language(CXX C)
+set(SOURCE)
+list(APPEND EXTRA_LIBS)
 
-# some options
-# option(MY_LIBRARY_USE_FANCY_NEW_CLASS "whether or not to use fancy new class" ON)
-# option(MY_LIBRARY_DEBUG_MODE "whether or not debug mode is activated" OFF)
-if ( TEENSY_VERSION )
-    if TEENSY_VER
-
-
-# add subdirectories
 add_subdirectory(src)
-add_subdirectory(cores)
+add_executable(MAIN ${SOURCE})
+set(TEENSY_VERSION 32)
+if ( TEENSY_VERSION EQUAL 30 OR TEENSY_VERSION EQUAL 31 OR TEENSY_VERSION EQUAL 32 OR TEENSY_VERSION EQUAL 35 OR TEENSY_VERSION EQUAL 36)
+    # add_subdirectory(cores/teensy3)
+    include_directories(cores/teensy3)
+elseif (TEENSY_VERSION EQUAL 40 or TEENSY_VERSION EQUAL 41)
+    # add_subdirectory(cores/teensy4)
+    include_directories(cores/teensy4)
+else()
+    # add_subdirectory(cores/teensy)
+    include_directories(cores/teensy)
+endif()
+
+include_directories(include)
+include_directories( bin/include)
+include_directories( bin)
+include_directories( bin/include-fixed)
+include_directories(include/c++/5.4.1)
+include_directories(include/c++/5.4.1/arm-none-eabi)
+
+#CPP and C Flags
+set(CXXFLAGS "-Wall -g -Os -mthumb -MMD -I. -DLowPower_h=1 -DF_CPU=48000000 -DUSB_SERIAL -DLAYOUT_US_ENGLISH -DARDUINO=10805 -DTEENSYDUINO=144")
+
+#CPP only
+set(CPPFLAGS "${CXXFLAGS} -felide-constructors -fno-exceptions -fno-rtti -std=gnu++14 ")
+
+# compiler options for C only
+set(CFLAGS "${CXXFLAGS}" )
+
+# linker options
+set(LDFLAGS "-L/teensyduino/include -Wl,--gc-sections,--defsym=__rtc_localtime=0 --specs=/teensyduino/include/nano.specs -mthumb -R/teensyduino/bin")
+
+
+# additional libraries to link
+set(LIBS "-lm")
+
+# compiler options specific to teensy version
+if (TEENSY_VERSION EQUAL 30)
+    set(CPPFLAGS "${CPPFLAGS} -D__MK20DX128__ -mcpu=cortex-m4")
+    set(CFLAGS "${CFLAGS} -D__MK20DX128__ -mcpu=cortex-m4")
+    set(LDSCRIPT mk20dx128.ld)
+    set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m4 ${LDSCRIPT}")
+elseif (TEENSY_VERSION EQUAL 31)
+    set(CPPFLAGS "${CPPFLAGS} -D__MK20DX256__ -mcpu=cortex-m4")
+    set(CFLAGS "${CFLAGS} -D__MK20DX256__ -mcpu=cortex-m4")
+    set(LDSCRIPT mk20dx256.ld)
+    set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m4 ${LDSCRIPT}")
+elseif (TEENSY_VERSION EQUAL 32)
+    set(CPPFLAGS "${CPPFLAGS} -D__MK20DX256__ -mcpu=cortex-m4")
+    set(CFLAGS "${CFLAGS} -D__MK20DX256__ -mcpu=cortex-m4")
+    set(LDSCRIPT mk20dx256.ld)
+    set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m4 -T/teensyduino/bin/${LDSCRIPT}")
+elseif (TEENSY_VERSION EQUAL LC)
+    set(CPPFLAGS "${CPPFLAGS} -D__MKL26Z64__ -mcpu=cortex-m0plus")
+    set(CFLAGS "${CFLAGS} -D__MKL26Z64__ -mcpu=cortex-m0plus")
+    set(LDSCRIPT mkl26z64.ld)
+    set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m0plus ${LDSCRIPT}")
+    set(LIBS "${LIBS} -larm_cortexM0l_math")
+elseif (TEENSY_VERSION EQUAL 35)
+    set(CPPFLAGS "${CPPFLAGS} -D__MK64FX512__ -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
+    set(CFLAGS "${CFLAGS} -D__MK64FX512__ -mcpu=cortex-m4")
+    set(LDSCRIPT mk64fx512.ld)
+    set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 ${LDSCRIPT}")
+    set(LIBS "${LIBS} -larm_cortexM4lf_math")
+elseif (TEENSY_VERSION EQUAL 36)
+    message(STATUS "Compiling for Teensy 3.6")
+    set(CPPFLAGS "${CPPFLAGS} -D__MK66FX1M0__ -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
+    set(CFLAGS "${CFLAGS} -D__MK66FX1M0__ -mcpu=cortex-m4")
+    set(LDSCRIPT mk66fx1m0.ld)
+    set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T/teensyduino/bin/${LDSCRIPT}")
+    set(LIBS "${LIBS} -larm_cortexM4lf_math")
+endif ()
+
+
+
+set(LDFLAGS "${LDFLAGS} ${LIBS}")
+SET ( CMAKE_CXX_FLAGS ${CPPFLAGS} CACHE STRING "c++ compile flags" FORCE)
+SET ( CMAKE_C_FLAGS ${CFLAGS} CACHE STRING "c compile flags" FORCE)
+SET ( CMAKE_EXE_LINKER_FLAGS ${LDFLAGS} CACHE STRING "linker flags" FORCE)
+
 add_subdirectory(libraries)
+message(STATUS ${EXTRA_LIBS})
+target_link_libraries(MAIN PUBLIC ${EXTRA_LIBS} )
+target_include_directories(MAIN PUBLIC ${EXTRA_LIBS} )
+
+
+add_custom_command(
+  TARGET MAIN POST_BUILD
+  COMMAND arm-none-eabi-objcopy -O ihex -R .eeprom MAIN main.hex
+  VERBATIM)
