@@ -18,9 +18,10 @@ def main():
     json_outer = usage_dict
 
     if os.path.exists("/teensyduino/config.json"):
-        json_overrides = json.load("/teensyduino/config.json")
-        for key, value in enumerate(json_overrides):
-            json_outer[key] = json_overrides[key]
+        with open("/teensyduino/config.json", "r") as f:
+            json_overrides = json.load(f)
+            for key, value in json_overrides.items():
+                json_outer[key] = json_overrides[key]
 
     with open("/teensyduino/config.json", "w") as f:
         json.dump(json_outer,f)

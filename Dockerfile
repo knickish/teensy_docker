@@ -99,10 +99,14 @@ RUN mkdir -p /teensyduino/install && \
 ADD CMake/project_root/* /teensyduino/
 ADD CMake/toolchain/* /teensyduino/
 ADD config.json /teensyduino/
-# ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy3
-# ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy4
-# ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy
+ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy3
+ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy4
+ADD CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy
 ADD CMake/select_all/CMakeLists.txt /teensyduino/src
+RUN rm /teensyduino/cores/teensy/main.* && \
+    rm /teensyduino/cores/teensy3/main.* && \
+    rm /teensyduino/cores/teensy4/main.*
+    
 WORKDIR /helper_scripts  
 ADD internal_scripts/* /helper_scripts/
 ENV PYTHONPATH="${PYTHONPATH}:/helper_scripts"
