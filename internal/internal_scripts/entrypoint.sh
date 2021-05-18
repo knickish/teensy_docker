@@ -15,5 +15,5 @@ cmake -DCMAKE_TOOLCHAIN_FILE=/teensyduino/teensy_toolchain.cmake \
      -B /teensyduino/build -S . 
 
 cd /teensyduino/build
-make -j4
+make -j8
 teensy_loader_cli --mcu=TEENSY${TEENSY_VERSION} -w -v main.hex
