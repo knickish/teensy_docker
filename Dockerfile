@@ -27,8 +27,6 @@ RUN apt -y \
     xz-utils \
     libfontconfig1 \
     libxft-dev \
-    rsync \
-    tree \ 
     python3.8 \
     && apt clean && rm -rf /var/lib/apt/lists
 
@@ -54,8 +52,6 @@ RUN git clone -q https://github.com/PaulStoffregen/teensy_loader_cli && \
     make
 ENV PATH="$PATH:/teensy_cli/teensy_loader_cli/"
 
-# ------------------------------------------------------------------------------
-# Check git setting
 WORKDIR /teensyduino
 RUN tar -xf arduino-1.8.13-linux64.tar.xz && \
     rm arduino-1.8.13-linux64.tar.xz && \
@@ -67,13 +63,11 @@ RUN tar -xf arduino-1.8.13-linux64.tar.xz && \
     cp -r /teensyduino/arduino-1.8.13/hardware/teensy/avr/libraries/* ./libraries && \
     cp -r /teensyduino/arduino-1.8.13/hardware/teensy/avr/cores/* ./cores 
 
+# some of the libraries used for many adafruit products
 WORKDIR /teensyduino/libraries
 RUN git clone https://github.com/adafruit/Adafruit_BusIO.git && \
     git clone https://github.com/adafruit/Adafruit-GFX-Library.git && \
     mkdir /src
-
-RUN apt update -y && \
-    apt install -y strace
 
 WORKDIR /teensyduino/bin
 RUN cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/bin/* . && \
@@ -82,15 +76,12 @@ RUN cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/bin/* . && \
     mkdir -p /teensyduino/lib/gcc && \
     cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* /teensyduino/lib/gcc
     
-
-
 WORKDIR /teensyduino/include
 RUN cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/include/* . && \
     cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/lib/armv7e-m/* . && \
     cp /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/lib/nano.specs . && \
-    mv /teensyduino/include/crt0.o /teensyduino/lib/gcc
+    mv crt0.o /teensyduino/lib/gcc
     
-
 ENV PATH="/teensyduino/bin:/teensyduino/include:/teensyduino/bin/plugin/include:$PATH"
 
 WORKDIR /teensyduino
@@ -111,9 +102,11 @@ WORKDIR /helper_scripts
 ADD internal/internal_scripts/* /helper_scripts/
 ENV PYTHONPATH="${PYTHONPATH}:/helper_scripts"
 
-
-ENV LD_LIBRARY_PATH="/teensyduino/bin"
-
 RUN cp /teensyduino/bin/arm-none-eabi-as /usr/bin/as
+
+#remove large files
+WORKDIR /teensyduino
+RUN rm -rf ./arduino-1.8.13 && \
+    rm TeensyduinoInstall.linux64
 
 CMD ["/bin/bash","/helper_scripts/entrypoint.sh"]

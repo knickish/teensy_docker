@@ -14,6 +14,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=/teensyduino/teensy_toolchain.cmake \
      -DCMAKE_AR=/usr/bin/ar -DTEENSY_VERSION:INTERNAL=${TEENSY_VERSION} \
      -B /teensyduino/build -S . 
 
+chmod -R 777 /teensyduino/build
 cd /teensyduino/build
-make -j8
+make -j$(nproc)
 teensy_loader_cli --mcu=TEENSY${TEENSY_VERSION} -w -v main.hex
