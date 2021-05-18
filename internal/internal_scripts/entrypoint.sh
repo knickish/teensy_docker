@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export TEENSY_VERSION=32
 cd /teensyduino 
 cp -ru /src/* /teensyduino/src 
 cp -ru /libs/* /teensyduino/libraries 
