@@ -80,6 +80,7 @@ WORKDIR /teensyduino/include
 RUN cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/include/* . && \
     cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/lib/armv7e-m/* . && \
     cp /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/lib/nano.specs . && \
+    cp /teensyduino/arduino-1.8.13/hardware/tools/arm/arm-none-eabi/lib/lib* . && \
     mv crt0.o /teensyduino/lib/gcc
     
 ENV PATH="/teensyduino/bin:/teensyduino/include:/teensyduino/bin/plugin/include:$PATH"

@@ -8,7 +8,10 @@ cp -ru /libs/* /teensyduino/libraries
 export CC=/teensyduino/bin
 export CXX=/teensyduino/bin
 export LIBRARY_PATH=/teensyduino/include:$LIBRARY_PATH
-find . | grep ble_system.h
+if [ ${TEENSY_VERSION} -eq 35 ] || [ ${TEENSY_VERSION} -eq 36 ]
+then
+     find /teensyduino/include/fpu/ -maxdepth 1 -type f -exec cp {} /teensyduino/include \;
+fi
 cmake -DCMAKE_TOOLCHAIN_FILE=/teensyduino/teensy_toolchain.cmake \
      -DCMAKE_AR=/usr/bin/ar -DTEENSY_VERSION:INTERNAL=${TEENSY_VERSION} \
      -B /teensyduino/build -S . 
