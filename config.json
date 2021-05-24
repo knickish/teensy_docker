@@ -1,7 +1,6 @@
 {
     "ks0108": {
         "supported": [
-            "LC"
         ],
         "conflicts": []
     },
@@ -13,7 +12,6 @@
     },
     "LowPower": {
         "supported": [
-            "LC"
         ],
         "conflicts": []
     },
@@ -34,7 +32,6 @@
     },
     "AltSoftSerial": {
         "supported": [
-            "LC",
             "30",
             "31",
             "32",
@@ -54,6 +51,30 @@
         ],
         "conflicts": []
     },
+    "ILI9341_t3": {
+        "supported": [
+            "30",
+            "31",
+            "32",
+            "35",
+            "36",
+            "40",
+            "41"
+        ],
+        "conflicts": []
+    },
+    "TeensyThreads": {
+        "supported": [
+            "30",
+            "31",
+            "32",
+            "35",
+            "36",
+            "40",
+            "41"
+        ],
+        "conflicts": []
+    },
     "Adafruit_VS1053": {
         "supported": [
             "LC",
@@ -68,7 +89,6 @@
     ,
     "FlexCAN": {
         "supported": [
-            "LC",
             "30",
             "31",
             "32",
@@ -79,7 +99,6 @@
     },
     "FrequencyTimer2": {
         "supported": [
-            "LC",
             "30",
             "31",
             "32",
@@ -90,7 +109,6 @@
     },
     "VirtualWire": {
         "supported": [
-            "LC",
             "30",
             "31",
             "32",
@@ -101,7 +119,6 @@
     }    ,
     "Tlc5940": {
         "supported": [
-            "LC",
             "30",
             "31",
             "32",
@@ -112,7 +129,6 @@
     }    ,
     "UTFT": {
         "supported": [
-            "LC",
             "30",
             "31",
             "32",

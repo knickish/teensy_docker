@@ -1,11 +1,25 @@
 import os, sys
 import json
 
+# "example_library": {
+#         "supported": [
+#             "LC",
+#             "30",
+#             "31",
+#             "32",
+#             "35",
+#             "36",
+#             "40",
+#             "41"
+#         ],
+#         "conflicts": []
+#     },
+
 conf_path = "/teensyduino/config.json"
 libs_path = "/teensyduino/libraries"
 
 def generate_lib_cmake(supported, conflicts, lib_name):
-    ifstr = [f"(TEENSY_VERSION EQUAL {x})" for x in supported]
+    ifstr = [f"(TEENSY_VERSION STREQUAL \"{x}\")" for x in supported]
     sep = " OR "
     ifstrProcessed = sep.join(ifstr)
     
