@@ -8,7 +8,7 @@ cp -ru /libs/* /teensyduino/libraries
 export CC=/teensyduino/bin
 export CXX=/teensyduino/bin
 export LIBRARY_PATH=/teensyduino/include:$LIBRARY_PATH
-if [ ${TEENSY_VERSION} -eq 35 ] || [ ${TEENSY_VERSION} -eq 36 ]
+if [ ${TEENSY_VERSION} -eq 35 ] || [ ${TEENSY_VERSION} -eq 36 ] || [ ${TEENSY_VERSION} -eq 40 ] || [ ${TEENSY_VERSION} -eq 41 ]
 then
      find /teensyduino/include/fpu/ -maxdepth 1 -type f -exec cp {} /teensyduino/include \;
 fi

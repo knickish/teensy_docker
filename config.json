@@ -31,5 +31,94 @@
             "41"
         ],
         "conflicts": []
+    },
+    "AltSoftSerial": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
+    },
+    "Adafruit_nRF8001": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
+    },
+    "Adafruit_VS1053": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
+    }
+    ,
+    "FlexCAN": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
+    },
+    "FrequencyTimer2": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
+    },
+    "VirtualWire": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
+    }    ,
+    "Tlc5940": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
+    }    ,
+    "UTFT": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36"
+        ],
+        "conflicts": []
     }
 }
