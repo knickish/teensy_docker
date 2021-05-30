@@ -4,11 +4,12 @@ project(TEENSY)
 include(macros.cmake)
 enable_language(CXX C)
 set(SOURCE)
-list(APPEND EXTRA_LIBS)
+list(APPEND EXTRA_INCLUDE_LIBS)
+list(APPEND EXTRA_LINK_LIBS)
 set(TEENSY_VERSION $ENV{TEENSY_VERSION})
 
 #CPP and C Flags
-set(CXXFLAGS "-Wall -g -mthumb -MMD -I. -DUSB_SERIAL -DLAYOUT_US_ENGLISH")
+set(CXXFLAGS " -Wall -g -mthumb -MMD -I. -DUSB_SERIAL -DLAYOUT_US_ENGLISH")
 
 #CPP only
 set(CPPFLAGS "")
@@ -112,13 +113,13 @@ if ( TEENSY_VERSION EQUAL 30 OR TEENSY_VERSION EQUAL 31 OR TEENSY_VERSION EQUAL 
     include_directories(cores/teensy3)
     add_subdirectory(cores/teensy3)
     add_executable(MAIN ${SOURCE})
-    target_link_libraries(MAIN PUBLIC ${EXTRA_LIBS})
+    target_link_libraries(MAIN PUBLIC ${EXTRA_LINK_LIBS})
 elseif (TEENSY_VERSION EQUAL 40 OR TEENSY_VERSION EQUAL 41)
     message(STATUS "Using Teensy4 Core")
     include_directories(cores/teensy4)
     add_subdirectory(cores/teensy4)
     add_executable(MAIN ${SOURCE})
-    target_link_libraries(MAIN PUBLIC ${EXTRA_LIBS} )
+    target_link_libraries(MAIN PUBLIC ${EXTRA_LINK_LIBS} )
 endif()
 
 include_directories(include)
@@ -132,8 +133,10 @@ include_directories(include/c++/5.4.1/arm-none-eabi)
 
 add_subdirectory(libraries)
 link_directories(libraries)
-target_link_libraries(MAIN PUBLIC ${EXTRA_LIBS} )
-target_include_directories(MAIN PUBLIC ${EXTRA_LIBS} )
+message(STATUS ${EXTRA_LINK_LIBS} )
+message(STATUS ${EXTRA_INCLUDE_LIBS} )
+target_link_libraries(MAIN PUBLIC ${EXTRA_LINK_LIBS} )
+target_include_directories(MAIN PUBLIC ${EXTRA_INCLUDE_LIBS} )
 
 
 add_custom_command(
