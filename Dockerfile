@@ -73,6 +73,7 @@ WORKDIR /teensyduino/bin
 RUN cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/bin/* . && \
     cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* . && \
     cp -u /teensyduino/cores/teensy3/*.ld . && \
+    cp -u /teensyduino/cores/teensy4/*.ld . && \
     mkdir -p /teensyduino/lib/gcc && \
     cp -r /teensyduino/arduino-1.8.13/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* /teensyduino/lib/gcc
     
@@ -97,7 +98,8 @@ ADD internal/CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy
 ADD internal/CMake/select_all/CMakeLists.txt /teensyduino/src
 RUN rm /teensyduino/cores/teensy/main.* && \
     rm /teensyduino/cores/teensy3/main.* && \
-    rm /teensyduino/cores/teensy4/main.*
+    rm /teensyduino/cores/teensy4/main.* && \
+    rm /teensyduino/cores/teensy4/Blink.cc
     
 WORKDIR /helper_scripts  
 ADD internal/internal_scripts/* /helper_scripts/
