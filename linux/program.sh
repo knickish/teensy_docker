@@ -16,4 +16,5 @@ docker run -t -i --privileged \
      -v ${DIR}/../artifacts/build:/teensyduino/build \
      -v ${DIR}/../artifacts/install:/teensyduino/install \
      --env TEENSY_VERSION=${1} \
+     --env PROGRAM_ON_BUILD=1 \
       teensy_dev:latest

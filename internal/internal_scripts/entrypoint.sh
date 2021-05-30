@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /teensyduino 
+cd /teensyduino/
 cp -ru /src/* /teensyduino/src 
 cp -ru /libs/* /teensyduino/libraries 
 /usr/bin/python3.8 -m lib_json_generator /teensyduino/libraries
@@ -22,5 +22,8 @@ make -j$(nproc)
 if [ $? -eq 0 ]
 then
      cp main.hex /teensyduino/install/
-     teensy_loader_cli --mcu=TEENSY${TEENSY_VERSION} -w -v main.hex
+     if [ ! ${PROGRAM_ON_BUILD} -eq 0 ]
+     then
+          teensy_loader_cli --mcu=TEENSY${TEENSY_VERSION} -w -v main.hex
+     fi
 fi

@@ -9,12 +9,13 @@ goto exit
 :program
 cd %~dp0..
 
-CALL docker run -t -i --privileged ^
-     -v /dev/bus/usb:/dev/bus/usb ^
+CALL docker run -t -i ^
      -v %CD%\src:/src ^
      -v %CD%\libs:/libs ^
      -v %CD%\artifacts\build:/teensyduino/build ^
+     -v %CD%\artifacts\install:/teensyduino/install ^
      --env TEENSY_VERSION=%1 ^
-      teensy_dev:latest
+     --env PROGRAM_ON_BUILD=0 ^
+     teensy_dev:latest
 
 :exit
