@@ -10,18 +10,16 @@ ARG WORKDIR=/root
 # Install tools via apt
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt -y update && \
-    apt -y \
-    install git \
+    apt -y install \
+    git \
     make \
     gcc \
     g++ \
     gcc-avr \
     binutils-avr \
     avr-libc \
-    cmake
-
-RUN apt -y \
-    install unzip \
+    cmake \
+    unzip \
     libusb-dev \
     wget \
     xz-utils \
