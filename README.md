@@ -6,6 +6,10 @@ To use, simply install docker, clone the repo, and run the OS-appropriate progra
 
 To build your code and program the device, run the program.sh script with one of 30,31,32,35,35,40, or 41 as the argument, depending on your teensy board. The script will pause at the end until a teensy board is plugged in and the button is pressed to allow programming.
 
-![](https://i.imgur.com/KcN6Hfq.gif)
+### Real-Time Full Build/Programming (~30s)
+![](https://i.imgur.com/VLQ9xak.gif)
+
+### Real-Time Rebuild/Programming (~5s)
+![](https://i.imgur.com/NhB57Mc.gif)
 
 Pull requests are welcome if bugs are encountered, I've tested on a 3.2, 3.6, 4.0, and 4.1 so far with at least basic programs. 
