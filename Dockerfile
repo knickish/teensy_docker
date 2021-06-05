@@ -28,6 +28,7 @@ RUN apt -y \
     libfontconfig1 \
     libxft-dev \
     python3.8 \
+    vim \
     && apt clean && rm -rf /var/lib/apt/lists
 
 RUN mkdir -p /etc/udev/rules.d/  && \  
@@ -94,10 +95,8 @@ ADD internal/CMake/toolchain/* /teensyduino/
 ADD config.json /teensyduino/
 ADD internal/CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy3
 ADD internal/CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy4
-ADD internal/CMake/select_all/CMakeLists.txt /teensyduino/cores/teensy
 ADD internal/CMake/select_all/CMakeLists.txt /teensyduino/src
-RUN rm /teensyduino/cores/teensy/main.* && \
-    rm /teensyduino/cores/teensy3/main.* && \
+RUN rm /teensyduino/cores/teensy3/main.* && \
     rm /teensyduino/cores/teensy4/main.* && \
     rm /teensyduino/cores/teensy4/Blink.cc
     
