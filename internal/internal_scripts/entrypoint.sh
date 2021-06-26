@@ -24,6 +24,6 @@ then
      cp main.hex /teensyduino/install/
      if [ ! ${PROGRAM_ON_BUILD} -eq 0 ]
      then
-          teensy_loader_cli --mcu=TEENSY${TEENSY_VERSION} -w -v main.hex
+          teensy_loader_cli --mcu=TEENSY${TEENSY_VERSION} -s -w -v main.hex
      fi
 fi
