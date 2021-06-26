@@ -12,7 +12,7 @@ set(TEENSY_VERSION $ENV{TEENSY_VERSION})
 set(CXXFLAGS " -Wall -g -mthumb -MMD -I. -DUSB_SERIAL -DLAYOUT_US_ENGLISH")
 
 #CPP only
-set(CPPFLAGS "")
+set(CPPFLAGS "-fexceptions")
 
 # compiler options for C only
 set(CFLAGS "")
@@ -71,7 +71,7 @@ elseif (TEENSY_VERSION EQUAL 40)
     message(STATUS "Compiling for Teensy 4.0")
     set(OPTIONS "-DF_CPU=600000000 -DARDUINO=10810 -DTEENSYDUINO=149 -DARDUINO_TEENSY40")
     set(CXXFLAGS "${CXXFLAGS} -D__IMXRT1062__ -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -Wno-error=narrowing -O2")
-    set(CPPFLAGS "${CPPFLAGS} -fpermissive")
+    set(CPPFLAGS "${CPPFLAGS} ")
     set(LDSCRIPT imxrt1062.ld)
     set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -T/teensyduino/bin/${LDSCRIPT}")
     set(LIBS "${LIBS} -larm_cortexM7lfsp_math -lstdc++")
@@ -80,7 +80,7 @@ elseif (TEENSY_VERSION EQUAL 41)
     message(STATUS "Compiling for Teensy 4.1")
     set(OPTIONS "-DF_CPU=600000000 -DARDUINO=10810 -DTEENSYDUINO=149 -DARDUINO_TEENSY41")
     set(CXXFLAGS "${CXXFLAGS} -D__IMXRT1062__ -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -Wno-error=narrowing -O2")
-    set(CPPFLAGS "${CPPFLAGS} -fpermissive")
+    set(CPPFLAGS "${CPPFLAGS}")
     set(LDSCRIPT imxrt1062_t41.ld)
     set(LDFLAGS "${LDFLAGS} -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -T/teensyduino/bin/${LDSCRIPT}")
     set(LIBS "${LIBS} -larm_cortexM7lfsp_math  -lstdc++")
@@ -90,7 +90,7 @@ endif ()
 set(CXXFLAGS "${CXXFLAGS} -Wall -g -mthumb -MMD -I. ${OPTIONS}")
 
 #CPP only
-set(CPPFLAGS "${CXXFLAGS} ${CPPFLAGS} -felide-constructors -fno-exceptions -fno-rtti -std=gnu++14 ")
+set(CPPFLAGS "${CXXFLAGS} ${CPPFLAGS} -felide-constructors -fno-rtti -std=gnu++17 ")
 
 # compiler options for C only
 set(CFLAGS "${CXXFLAGS}" )
