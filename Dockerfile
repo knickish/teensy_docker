@@ -39,7 +39,7 @@ RUN mkdir -p /etc/udev/rules.d/  && \
 # Download large files
 WORKDIR /teensyduino
 RUN wget -q https://downloads.arduino.cc/arduino-1.8.15-linux64.tar.xz && \
-    wget -q https://www.pjrc.com/teensy/td_154-beta10/TeensyduinoInstall.linux64
+    wget -q https://www.pjrc.com/teensy/td_154/TeensyduinoInstall.linux64
 
 # ------------------------------------------------------------------------------
 # Configure teensyloader cli
