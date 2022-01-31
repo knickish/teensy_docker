@@ -24,10 +24,10 @@ def generate_lib_cmake(supported, conflicts, lib_name):
     ifstrProcessed = sep.join(ifstr)
     
     ret = f'\nIF({ifstrProcessed})'
-    ret+= f'\nfile(GLOB {lib_name}_sources CONFIGURE_DEPENDS "*.h" "*.cpp" "*.c++" "*.c" "*.hpp" '
-    ret+= '"src/*.h" "src/*.cpp" "src/*.c++" "src/*.c" "src/*.hpp" '
-    ret+= '"utility/*.h" "utility/*.cpp" "utility/*.c++" "utility/*.c" "utility/*.hpp" '
-    ret+= '"src/utility/*.h" "src/utility/*.cpp" "src/utility/*.c++" "src/utility/*.c" "src/utility/*.hpp")'
+    ret+= f'\nfile(GLOB {lib_name}_sources CONFIGURE_DEPENDS "*.h" "*.cpp" "*.c++" "*.c" "*.hpp" "*.S" '
+    ret+= '"src/*.h" "src/*.cpp" "src/*.c++" "src/*.c" "src/*.hpp" "src/*.S" '
+    ret+= '"utility/*.h" "utility/*.cpp" "utility/*.c++" "utility/*.c" "utility/*.hpp" "utility/*.S" '
+    ret+= '"src/utility/*.h" "src/utility/*.cpp" "src/utility/*.c++" "src/utility/*.c" "src/utility/*.hpp" "src/utility/*.S")'
     ret+= f"\nadd_library({lib_name} STATIC ${{{lib_name}_sources}})"
     ret+= f"\nset_target_properties({lib_name} PROPERTIES LINKER_LANGUAGE CXX)"
     ret+= f"\ntarget_include_directories({lib_name} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}})"
