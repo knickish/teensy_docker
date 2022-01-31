@@ -6,27 +6,29 @@ FROM ubuntu:20.04
 # Arguments
 ARG WORKDIR=/root
 
+ENV DOCKER_ARDUINO_VERSION=arduino-1.8.19
+ENV DOCKER_TEENSY_TD_VERSION=td_156
 # ------------------------------------------------------------------------------
 # Install tools via apt
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt -y update && \
     apt -y install \
-    git \
-    make \
-    gcc \
-    g++ \
-    gcc-avr \
-    binutils-avr \
     avr-libc \
+    binutils-avr \
     cmake \
-    unzip \
+    g++ \
+    gcc \
+    gcc-avr \
+    git \
+    libfontconfig1 \
     libusb-dev \
+    libxft-dev \
+    make \
+    python3.8 \
+    unzip \
+    vim \
     wget \
     xz-utils \
-    libfontconfig1 \
-    libxft-dev \
-    python3.8 \
-    vim \
     && apt clean && rm -rf /var/lib/apt/lists
 
 RUN mkdir -p /etc/udev/rules.d/  && \  
@@ -38,8 +40,8 @@ RUN mkdir -p /etc/udev/rules.d/  && \
 # ------------------------------------------------------------------------------
 # Download large files
 WORKDIR /teensyduino
-RUN wget -q https://downloads.arduino.cc/arduino-1.8.15-linux64.tar.xz && \
-    wget -q https://www.pjrc.com/teensy/td_154/TeensyduinoInstall.linux64
+RUN wget -q https://downloads.arduino.cc/${DOCKER_ARDUINO_VERSION}-linux64.tar.xz && \
+    wget -q https://www.pjrc.com/teensy/${DOCKER_TEENSY_TD_VERSION}/TeensyduinoInstall.linux64
 
 # ------------------------------------------------------------------------------
 # Configure teensyloader cli
@@ -52,35 +54,36 @@ RUN git clone -q https://github.com/PaulStoffregen/teensy_loader_cli && \
 ENV PATH="$PATH:/teensy_cli/teensy_loader_cli/"
 
 WORKDIR /teensyduino
-RUN tar -xf arduino-1.8.15-linux64.tar.xz && \
-    rm arduino-1.8.15-linux64.tar.xz && \
+RUN tar -xf ${DOCKER_ARDUINO_VERSION}-linux64.tar.xz && \
+    rm ${DOCKER_ARDUINO_VERSION}-linux64.tar.xz && \
     chmod 755 TeensyduinoInstall.linux64 && \
-    ./TeensyduinoInstall.linux64 --dir=/teensyduino/arduino-1.8.15 && \
+    ./TeensyduinoInstall.linux64 --dir=/teensyduino/${DOCKER_ARDUINO_VERSION} && \
     mkdir -p ./libraries && \
     mkdir -p ./cores && \
     mkdir -p ./src && \
-    cp -r /teensyduino/arduino-1.8.15/hardware/teensy/avr/libraries/* ./libraries && \
-    cp -r /teensyduino/arduino-1.8.15/hardware/teensy/avr/cores/* ./cores 
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/teensy/avr/libraries/* ./libraries && \
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/teensy/avr/cores/* ./cores 
 
 # some of the libraries used for many adafruit products
 WORKDIR /teensyduino/libraries
-RUN git clone https://github.com/adafruit/Adafruit_BusIO.git && \
+RUN  \ 
+    git clone https://github.com/adafruit/Adafruit_BusIO.git && \
     git clone https://github.com/adafruit/Adafruit-GFX-Library.git && \
     mkdir /src
 
 WORKDIR /teensyduino/bin
-RUN cp -r /teensyduino/arduino-1.8.15/hardware/tools/arm/bin/* . && \
-    cp -r /teensyduino/arduino-1.8.15/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* . && \
+RUN cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/bin/* . && \
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* . && \
     cp -u /teensyduino/cores/teensy3/*.ld . && \
     cp -u /teensyduino/cores/teensy4/*.ld . && \
     mkdir -p /teensyduino/lib/gcc && \
-    cp -r /teensyduino/arduino-1.8.15/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* /teensyduino/lib/gcc
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* /teensyduino/lib/gcc
     
 WORKDIR /teensyduino/include
-RUN cp -r /teensyduino/arduino-1.8.15/hardware/tools/arm/arm-none-eabi/include/* . && \
-    cp -r /teensyduino/arduino-1.8.15/hardware/tools/arm/arm-none-eabi/lib/armv7e-m/* . && \
-    cp /teensyduino/arduino-1.8.15/hardware/tools/arm/arm-none-eabi/lib/nano.specs . && \
-    cp /teensyduino/arduino-1.8.15/hardware/tools/arm/arm-none-eabi/lib/lib* . && \
+RUN cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/include/* . && \
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/lib/armv7e-m/* . && \
+    cp /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/lib/nano.specs . && \
+    cp /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/lib/lib* . && \
     mv crt0.o /teensyduino/lib/gcc
     
 ENV PATH="/teensyduino/bin:/teensyduino/include:/teensyduino/bin/plugin/include:$PATH"
@@ -106,7 +109,7 @@ RUN cp /teensyduino/bin/arm-none-eabi-as /usr/bin/as
 
 #remove large files
 WORKDIR /teensyduino
-RUN rm -rf ./arduino-1.8.15 && \
+RUN rm -rf ./${DOCKER_ARDUINO_VERSION} && \
     rm TeensyduinoInstall.linux64
 
 CMD ["/bin/bash","/helper_scripts/entrypoint.sh"]
