@@ -97,6 +97,13 @@
         ],
         "conflicts": []
     },
+    "FlexIO_t4": {
+        "supported": [
+            "40",
+            "41"
+        ],
+        "conflicts": []
+    },
     "FrequencyTimer2": {
         "supported": [
             "30",
