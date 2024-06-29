@@ -143,5 +143,28 @@
             "36"
         ],
         "conflicts": []
+    },
+    "SdFat": {
+        "supported": [
+            "LC",
+            "30",
+            "31",
+            "32",
+            "35",
+            "36",
+            "40",
+            "41"
+        ],
+        "conflicts": [],
+        "subdirs": [
+            "DigitalIO",
+            "ExFatLib",
+            "FatLib",
+            "FsLib",
+            "SdCard",
+            "SpiDriver",
+            "common",
+            "iostream"
+        ]
     }
 }

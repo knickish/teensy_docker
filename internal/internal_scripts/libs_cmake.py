@@ -1,5 +1,6 @@
 import os, sys
 import json
+from typing import Optional, List
 
 # "example_library": {
 #         "supported": [
@@ -13,24 +14,25 @@ import json
 #             "41"
 #         ],
 #         "conflicts": []
+#         "subdirs": []
 #     },
 
 conf_path = "/teensyduino/config.json"
 libs_path = "/teensyduino/libraries"
 
-def generate_lib_cmake(supported, conflicts, lib_name):
-    ifstr = [f"(TEENSY_VERSION STREQUAL \"{x}\")" for x in supported]
-    sep = " OR "
-    ifstrProcessed = sep.join(ifstr)
+def generate_lib_cmake(supported, conflicts, subdirs: Optional[List[str]], lib_name):
+    ifstrs = [f"(TEENSY_VERSION STREQUAL \"{x}\")" for x in supported]
     
-    ret = f'\nIF({ifstrProcessed})'
+    ret = f'\nIF({" OR ".join(ifstrs)})'
     ret+= f'\nfile(GLOB {lib_name}_sources CONFIGURE_DEPENDS "*.h" "*.cpp" "*.c++" "*.c" "*.hpp" "*.S" '
     ret+= '"src/*.h" "src/*.cpp" "src/*.c++" "src/*.c" "src/*.hpp" "src/*.S" '
     ret+= '"utility/*.h" "utility/*.cpp" "utility/*.c++" "utility/*.c" "utility/*.hpp" "utility/*.S" '
     ret+= '"src/utility/*.h" "src/utility/*.cpp" "src/utility/*.c++" "src/utility/*.c" "src/utility/*.hpp" "src/utility/*.S")'
     ret+= f"\nadd_library({lib_name} STATIC ${{{lib_name}_sources}})"
     ret+= f"\nset_target_properties({lib_name} PROPERTIES LINKER_LANGUAGE CXX)"
-    ret+= f"\ntarget_include_directories({lib_name} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}})"
+    ret+= f"\ntarget_include_directories({lib_name} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}})\n"
+    if subdirs:
+        ret+= "\n".join([f"target_include_directories({lib_name} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}}/src/{subdir})" for subdir in subdirs])
     ret+= f"\nset(LIBNAME \"{lib_name}\" PARENT_SCOPE)"
     ret+= "\nENDIF()"
     return ret
@@ -88,8 +90,11 @@ def build(lib_dir):
     for direct in os.listdir(libs_path):
         if os.path.isdir(os.path.join(lib_dir, direct)):
             if direct in config:
+                subdirs = None
+                if "subdirs" in config[direct]:
+                    subdirs = config[direct]["subdirs"]
                 with open(os.path.join(lib_dir, direct, "CMakeLists.txt"), "w") as f:
-                    f.write(generate_lib_cmake(config[direct]["supported"], config[direct]["conflicts"], direct))
+                    f.write(generate_lib_cmake(config[direct]["supported"], config[direct]["conflicts"], subdirs, direct))
     
     with open(os.path.join(lib_dir, "CMakeLists.txt"), "w") as f:
         f.write(generate_lib_top_cmake(config))
