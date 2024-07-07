@@ -3,8 +3,8 @@
 cd /teensyduino/
 cp -ru /src/* /teensyduino/src 
 cp -ru /libs/* /teensyduino/libraries 
-/usr/bin/python3.8 -m lib_json_generator /teensyduino/libraries
-/usr/bin/python3.8 -m libs_cmake /teensyduino/libraries
+/usr/bin/python3 -m lib_json_generator /teensyduino/libraries
+/usr/bin/python3 -m libs_cmake /teensyduino/libraries
 export CC=/teensyduino/bin
 export CXX=/teensyduino/bin
 export LIBRARY_PATH=/teensyduino/include:$LIBRARY_PATH

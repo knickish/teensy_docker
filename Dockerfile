@@ -7,7 +7,8 @@ FROM ubuntu:20.04
 ARG WORKDIR=/root
 
 ENV DOCKER_ARDUINO_VERSION=arduino-1.8.19
-ENV DOCKER_TEENSY_TD_VERSION=td_156
+ENV DOCKER_TEENSY_TD_VERSION=td_159
+ENV GNU_VER=11.3.1
 # ------------------------------------------------------------------------------
 # Install tools via apt
 ENV DEBIAN_FRONTEND=noninteractive
@@ -24,7 +25,8 @@ RUN apt -y update && \
     libusb-dev \
     libxft-dev \
     make \
-    python3.8 \
+    python3 \
+    strace \
     unzip \
     vim \
     wget \
@@ -64,6 +66,15 @@ RUN tar -xf ${DOCKER_ARDUINO_VERSION}-linux64.tar.xz && \
     cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/teensy/avr/libraries/* ./libraries && \
     cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/teensy/avr/cores/* ./cores 
 
+# download the ShiftPWM fix
+WORKDIR /teensyduino/libraries/ShiftPWM
+RUN rm -rf ./* && \
+    git init && \
+    git remote add origin https://github.com/PaulStoffregen/ShiftPWM.git && \
+    git fetch origin 4c25bfda72ac3cb99fc20ae7cb8c35aa8926e363 && \
+    git checkout 4c25bfda72ac3cb99fc20ae7cb8c35aa8926e363 && \
+    rm -rf ./.git
+
 # some of the libraries used for many adafruit products
 WORKDIR /teensyduino/libraries
 RUN  \ 
@@ -73,19 +84,22 @@ RUN  \
 
 WORKDIR /teensyduino/bin
 RUN cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/bin/* . && \
-    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* . && \
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/lib/gcc/arm-none-eabi/${GNU_VER}/* . && \
+	cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/libexec/gcc/arm-none-eabi/${GNU_VER}/* . && \
     cp -u /teensyduino/cores/teensy3/*.ld . && \
     cp -u /teensyduino/cores/teensy4/*.ld . && \
     mkdir -p /teensyduino/lib/gcc && \
-    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/lib/gcc/arm-none-eabi/5.4.1/* /teensyduino/lib/gcc
+    mkdir -p /teensyduino/libexec/gcc && \
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/libexec/gcc/arm-none-eabi/${GNU_VER}/* /teensyduino/libexec/gcc && \
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/lib/gcc/arm-none-eabi/${GNU_VER}/* /teensyduino/lib/gcc
     
 WORKDIR /teensyduino/include
 RUN cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/include/* . && \
-    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/lib/armv7e-m/* . && \
+    cp -r /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/lib/thumb/v7e-m+dp/* . && \
     cp /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/lib/nano.specs . && \
     cp /teensyduino/${DOCKER_ARDUINO_VERSION}/hardware/tools/arm/arm-none-eabi/lib/lib* . && \
-    mv crt0.o /teensyduino/lib/gcc
-    
+    mv hard/crt0.o /teensyduino/lib/gcc
+
 ENV PATH="/teensyduino/bin:/teensyduino/include:/teensyduino/bin/plugin/include:$PATH"
 
 WORKDIR /teensyduino
@@ -107,9 +121,12 @@ ENV PYTHONPATH="${PYTHONPATH}:/helper_scripts"
 
 RUN cp /teensyduino/bin/arm-none-eabi-as /usr/bin/as
 
-#remove large files
-WORKDIR /teensyduino
-RUN rm -rf ./${DOCKER_ARDUINO_VERSION} && \
-    rm TeensyduinoInstall.linux64
+WORKDIR /teensyduino/libexec/gcc/arm-none-eabi/11.3.1/
+RUN ln -s /teensyduino/bin/liblto_plugin.so liblto_plugin.so
+
+# #remove large files
+# WORKDIR /teensyduino
+# RUN \ # rm -rf ./${DOCKER_ARDUINO_VERSION} && \
+#     rm TeensyduinoInstall.linux64
 
 CMD ["/bin/bash","/helper_scripts/entrypoint.sh"]

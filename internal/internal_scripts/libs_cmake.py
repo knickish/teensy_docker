@@ -26,18 +26,26 @@ def generate_lib_cmake(supported, conflicts, subdirs: Optional[List[str]], lib_n
     ret = f'\nIF({" OR ".join(ifstrs)})'
     ret+= f'\nfile(GLOB {lib_name}_sources CONFIGURE_DEPENDS "*.h" "*.cpp" "*.c++" "*.c" "*.hpp" "*.S" '
     ret+= '"src/*.h" "src/*.cpp" "src/*.c++" "src/*.c" "src/*.hpp" "src/*.S" '
+    if subdirs:
+        for subdir in subdirs:
+            ret+= f'"src/{subdir}/*.h" "src/{subdir}/*.cpp" "src/{subdir}/*.c++" "src/{subdir}/*.c" "src/{subdir}/*.hpp" "src/{subdir}/*.S"'
     ret+= '"utility/*.h" "utility/*.cpp" "utility/*.c++" "utility/*.c" "utility/*.hpp" "utility/*.S" '
     ret+= '"src/utility/*.h" "src/utility/*.cpp" "src/utility/*.c++" "src/utility/*.c" "src/utility/*.hpp" "src/utility/*.S")'
     ret+= f"\nadd_library({lib_name} STATIC ${{{lib_name}_sources}})"
     ret+= f"\nset_target_properties({lib_name} PROPERTIES LINKER_LANGUAGE CXX)"
     ret+= f"\ntarget_include_directories({lib_name} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}})\n"
-    if subdirs:
-        ret+= "\n".join([f"target_include_directories({lib_name} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}}/src/{subdir})" for subdir in subdirs])
+    # if subdirs:
+    #     for subdir in subdirs:
+    #         ret+= f'\nfile(GLOB {subdir}_sources CONFIGURE_DEPENDS "src/{subdir}/*.h" "src/{subdir}/*.cpp" "src/{subdir}/*.c++" "src/{subdir}/*.c" "src/{subdir}/*.hpp" "src/{subdir}/*.S")'
+    #         ret+= f"\nadd_library({subdir} STATIC ${{{subdir}_sources}})"
+    #         ret+= f"\nset_target_properties({subdir} PROPERTIES LINKER_LANGUAGE CXX)"
+    #         ret+= f"\ntarget_include_directories({subdir} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}})\n"
+    #         ret+= f"\ntarget_include_directories({lib_name} PUBLIC ${{CMAKE_CURRENT_LIST_DIR}}/src/{subdir})"
     ret+= f"\nset(LIBNAME \"{lib_name}\" PARENT_SCOPE)"
     ret+= "\nENDIF()"
     return ret
 
-def generate_lib_top_cmake(config):
+def generate_lib_top_cmake():
     ret = """message(STATUS "${CMAKE_CURRENT_LIST_DIR}")
             \nSUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_LIST_DIR})
             \nlist(APPEND EXTRA_INCLUDE_LIBS_INNER)
@@ -97,7 +105,7 @@ def build(lib_dir):
                     f.write(generate_lib_cmake(config[direct]["supported"], config[direct]["conflicts"], subdirs, direct))
     
     with open(os.path.join(lib_dir, "CMakeLists.txt"), "w") as f:
-        f.write(generate_lib_top_cmake(config))
+        f.write(generate_lib_top_cmake())
     
     return 0
     
